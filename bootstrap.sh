@@ -27,7 +27,7 @@ else
     git pull
 fi
 
-# 4. Select and Execute Playbook
+# 4. Select Playbook and Show Command
 cd "$DEST"
 echo ""
 echo "📜 Available playbooks in $REPO_NAME:"
@@ -42,8 +42,8 @@ CHOICE=${CHOICE:-1}
 SELECTED_PLAYBOOK="${PLAYBOOKS[$((CHOICE-1))]}"
 
 if [[ -f "$SELECTED_PLAYBOOK" ]]; then
-    echo "🛠️ Running Ansible playbook: $SELECTED_PLAYBOOK..."
-    ansible-playbook "$SELECTED_PLAYBOOK" -i "localhost," --connection=local --ask-vault-pass
+    echo "💡 To run this playbook, use the following command:"
+    echo "   ansible-playbook \"$DEST/$SELECTED_PLAYBOOK\" -i \"localhost,\" --connection=local --ask-vault-pass"
 else
     echo "❌ Invalid selection. Exiting."
     exit 1
