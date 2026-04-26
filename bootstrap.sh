@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Prevent GUI prompt errors when running in terminal
+unset GIT_ASKPASS SSH_ASKPASS
+
 echo "🚀 Starting Fedora Bootstrap..."
 
 # 1. Install system dependencies
@@ -13,6 +16,9 @@ if ! gh auth status &>/dev/null; then
     echo "Follow the prompts to log in via your browser."
     gh auth login --hostname github.com --git-protocol https --web
 fi
+
+# Configure Git to use GitHub CLI for authentication
+gh auth setup-git -h github.com
 
 # 3. Clone the private provisioning repository
 REPO_NAME="provisioning"
@@ -36,7 +42,7 @@ for i in "${!PLAYBOOKS[@]}"; do
     echo "  $((i+1))) ${PLAYBOOKS[$i]}"
 done
 
-read -p "Select a playbook to run [default: 1]: " CHOICE
+read -p "Select a playbook to run [default: 1]: " CHOICE < /dev/tty
 CHOICE=${CHOICE:-1}
 
 SELECTED_PLAYBOOK="${PLAYBOOKS[$((CHOICE-1))]}"
