@@ -1,8 +1,8 @@
 # Bootstrap
 
-This is a public repository containing the entry-point script for my private provisioning setup. It handles system dependencies, GitHub authentication, and clones the private `provisioning` repo.
+This is a public repository containing the entry-point script for my private provisioning setup. It bridges the gap between a fresh Fedora install and a fully provisioned environment.
 
-## Quick Start
+## 🚀 Quick Start
 
 Run this one-liner on a fresh Fedora installation:
 
@@ -11,7 +11,10 @@ curl -sSL https://raw.githubusercontent.com/nobler1050/bootstrap/main/bootstrap.
 ```
 
 ## What it does
-1.  Installs `git`, `gh` (GitHub CLI), and `ansible`.
-2.  Guides you through `gh auth login` to access private repositories.
-3.  Clones the private `provisioning` repository to `~/provisioning`.
-4.  Prompts you to select an Ansible playbook (e.g., `wsl.yml`, `laptop.yml`) to run.
+1.  **System Prep:** Installs `git`, `gh` (GitHub CLI), and `ansible`.
+2.  **Authentication:** Guides you through `gh auth login` to gain access to private repositories.
+3.  **Clone:** Clones the private `provisioning` repository to `~/git/provisioning`.
+4.  **Handoff:** Prompts you to select an initial playbook to run and provides instructions for future updates.
+
+## Next Steps
+Once bootstrapped, all future updates and configuration changes are managed within the [Provisioning](https://github.com/nobler1050/provisioning) repository.
