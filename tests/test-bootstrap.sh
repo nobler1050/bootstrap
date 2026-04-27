@@ -1,5 +1,5 @@
 #!/bin/bash
-# test-bootstrap.sh - Test the bootstrap process in a fresh Fedora container
+# test-bootstrap.sh - Test the actual one-liner from the README
 
 set -e
 
@@ -12,10 +12,8 @@ podman build -t fedora-bootstrap-test bootstrap/tests/
 
 # 2. Run the container
 echo "🚀 Starting Fedora test container with Podman..."
-# Remove old container if it exists
 podman rm -f fedora-test &>/dev/null || true
 
-# Podman handles systemd automatically when /usr/sbin/init is the entrypoint
 podman run -d \
     --name fedora-test \
     -e GITHUB_TOKEN="$GITHUB_TOKEN" \
@@ -25,16 +23,24 @@ podman run -d \
 echo "⏳ Waiting for systemd to initialize..."
 sleep 3
 
-# 3. Copy bootstrap.sh into the container
-echo "📂 Copying bootstrap.sh to container..."
-podman cp bootstrap/bootstrap.sh fedora-test:/home/rnoble/bootstrap.sh
-podman exec --user root fedora-test chown rnoble:rnoble /home/rnoble/bootstrap.sh
-podman exec --user root fedora-test chmod +x /home/rnoble/bootstrap.sh
+# 3. Run the EXACT one-liner from README
+echo "🏃 Running the one-liner..."
+# This clones the repo into ~/git/provisioning
+podman exec -u rnoble -e GITHUB_TOKEN="$GITHUB_TOKEN" fedora-test \
+    bash -c "curl -sSL https://raw.githubusercontent.com/nobler1050/bootstrap/main/bootstrap.sh | bash"
 
-# 4. Run the bootstrap script
-echo "🏃 Running bootstrap.sh inside container as rnoble..."
-# Run as rnoble to ensure proper home directory and permissions
-podman exec -u rnoble -e GITHUB_TOKEN="$GITHUB_TOKEN" fedora-test /home/rnoble/bootstrap.sh
+# 4. Copy password files if they exist locally
+PROV_DIR="provisioning"
+if [ -d "$PROV_DIR" ]; then
+    echo "🔐 Copying secret files to the cloned repository..."
+    for f in .vault_pass .become_pass; do
+        if [ -f "$PROV_DIR/$f" ]; then
+            echo "  📂 Copying $f..."
+            podman cp "$PROV_DIR/$f" "fedora-test:/home/rnoble/git/provisioning/$f"
+            podman exec --user root fedora-test chown rnoble:rnoble "/home/rnoble/git/provisioning/$f"
+        fi
+    done
+fi
 
-echo "✅ Container is still running for inspection."
+echo "✅ Bootstrap complete. Container is still running for inspection."
 echo "💡 Use: podman exec -it fedora-test /bin/bash"

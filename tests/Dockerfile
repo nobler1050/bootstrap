@@ -1,14 +1,13 @@
 FROM fedora:latest
 
-# Install only the bare essentials to allow bootstrap.sh to do its job
-# We need sudo so the script can install its own packages
-RUN dnf install -y sudo systemd && dnf clean all
+# Install essentials
+RUN dnf install -y sudo systemd curl && dnf clean all
 
-# Setup a test user that matches your environment
+# Setup a test user
 RUN useradd -m -G wheel rnoble && \
     echo "rnoble ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# systemd setup - simpler for modern Fedora
+# systemd setup
 ENV container=docker
 STOPSIGNAL SIGRTMIN+3
 
