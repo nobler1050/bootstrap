@@ -26,14 +26,16 @@ fi
 gh auth setup-git -h github.com
 
 # 3. Clone the private provisioning repository
+echo "🔍 Fetching GitHub username..."
+GH_USER=$(gh api user --jq .login)
 REPO_NAME="provisioning"
 DEST="$HOME/git/$REPO_NAME" # Standardizing to ~/git/
 
 mkdir -p "$(dirname "$DEST")"
 
 if [ ! -d "$DEST" ]; then
-    echo "📂 Cloning private repository: $REPO_NAME..."
-    gh repo clone "nobler1050/$REPO_NAME" "$DEST"
+    echo "📂 Cloning private repository: $GH_USER/$REPO_NAME..."
+    gh repo clone "$GH_USER/$REPO_NAME" "$DEST"
 else
     echo "🔄 Updating existing repository in $DEST..."
     cd "$DEST"
