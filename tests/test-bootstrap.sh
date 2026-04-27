@@ -29,17 +29,14 @@ echo "🏃 Running the one-liner..."
 podman exec -u rnoble -e GITHUB_TOKEN="$GITHUB_TOKEN" fedora-test \
     bash -c "curl -sSL https://raw.githubusercontent.com/nobler1050/bootstrap/main/bootstrap.sh | bash"
 
-# 4. Copy password files if they exist locally
+# 4. Copy vault password file if it exists locally
 PROV_DIR="provisioning"
 if [ -d "$PROV_DIR" ]; then
-    echo "🔐 Copying secret files to the cloned repository..."
-    for f in .vault_pass .become_pass; do
-        if [ -f "$PROV_DIR/$f" ]; then
-            echo "  📂 Copying $f..."
-            podman cp "$PROV_DIR/$f" "fedora-test:/home/rnoble/git/provisioning/$f"
-            podman exec --user root fedora-test chown rnoble:rnoble "/home/rnoble/git/provisioning/$f"
-        fi
-    done
+    if [ -f "$PROV_DIR/.vault_pass" ]; then
+        echo "🔐 Copying .vault_pass to the cloned repository..."
+        podman cp "$PROV_DIR/.vault_pass" "fedora-test:/home/rnoble/git/provisioning/.vault_pass"
+        podman exec --user root fedora-test chown rnoble:rnoble "/home/rnoble/git/provisioning/.vault_pass"
+    fi
 fi
 
 echo "✅ Bootstrap complete. Container is still running for inspection."
